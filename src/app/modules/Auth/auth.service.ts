@@ -156,81 +156,7 @@ const socialLogin = async (payload: any) => {
   };
 };
 
-// website login after booking
-const loginWebsite = async (payload: ISignupRequest) => {
-  const { fullName, email, password, contactNumber, country, fcmToken, role } =
-    payload;
 
-  // check if user already exists
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
-  });
-
-  if (existingUser) {
-    throw new ApiError(
-      httpStatus.CONFLICT,
-      "User already exists with this email"
-    );
-  }
-
-  // use default password if not provided
-  const finalPassword = password && password.length >= 6 ? password : "123456";
-
-  // hash password
-  const hashedPassword = await bcrypt.hash(finalPassword, 12);
-
-  // create user
-  const newUser = await prisma.user.create({
-    data: {
-      fullName,
-      email,
-      password: hashedPassword,
-      contactNumber: contactNumber || null,
-      country: country || null,
-      role: (role as UserRole) || UserRole.USER,
-      status: UserStatus.ACTIVE,
-      fcmToken: fcmToken || "",
-    },
-  });
-
-  // generate token
-  const accessToken = jwtHelpers.generateToken(
-    {
-      id: newUser.id,
-      email: newUser.email,
-      role: newUser.role,
-    },
-    config.jwt.jwt_secret as Secret,
-    config.jwt.expires_in as string
-  );
-
-  const refreshToken = jwtHelpers.generateToken(
-    {
-      id: newUser.id,
-      email: newUser.email,
-      role: newUser.role,
-    },
-    config.jwt.refresh_token_secret as Secret,
-    config.jwt.refresh_token_expires_in as string
-  );
-
-  const result: ISignupResponse = {
-    accessToken,
-    refreshToken,
-    user: {
-      id: newUser.id,
-      fullName: newUser.fullName,
-      email: newUser.email,
-      profileImage: newUser.profileImage,
-      contactNumber: newUser.contactNumber,
-      country: newUser.country,
-      role: newUser.role,
-      fcmToken: newUser.fcmToken,
-    },
-  };
-
-  return result;
-};
 
 // refresh token
 const refreshToken = async (token: string) => {
@@ -374,69 +300,7 @@ const forgotPassword = async (payload: { email: string }) => {
   };
 };
 
-// forgot password
-// const forgotPassword = async (payload: { email: string }) => {
-//   const userData = await prisma.user.findUnique({
-//     where: {
-//       email: payload.email,
-//     },
-//   });
-//   if (!userData) {
-//     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
-//   }
 
-//   const resetPassToken = jwtHelpers.generateToken(
-//     { email: userData.email, role: userData.role },
-//     config.jwt.reset_pass_secret as Secret,
-//     config.jwt.reset_pass_token_expires_in as string
-//   );
-
-//   const resetPassLink =
-//     config.reset_pass_link + `?userId=${userData.id}&token=${resetPassToken}`;
-
-//   await emailSender(
-//     "Reset Your Password",
-//     userData.email,
-//     `<!DOCTYPE html>
-// <html lang="en">
-// <head>
-//     <meta charset="UTF-8">
-//     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//     <title>Password Reset Request</title>
-// </head>
-// <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7fa; margin: 0; padding: 20px; line-height: 1.6; color: #333333;">
-//     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
-//         <div style="background-color: #FF7600; padding: 30px 20px; text-align: center;">
-//             <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;">Password Reset Request</h1>
-//         </div>
-//         <div style="padding: 40px 30px;">
-//             <p style="font-size: 16px; margin-bottom: 20px;">Dear User,</p>
-
-//             <p style="font-size: 16px; margin-bottom: 30px;">We received a request to reset your password. Click the button below to reset your password:</p>
-
-//             <div style="text-align: center; margin-bottom: 30px;">
-//                 <a href=${resetPassLink} style="display: inline-block; background-color: #FF7600; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: 600; transition: background-color 0.3s ease;">
-//                     Reset Password
-//                 </a>
-//             </div>
-
-//             <p style="font-size: 16px; margin-bottom: 20px;">If you did not request a password reset, please ignore this email or contact support if you have any concerns.</p>
-
-//             <p style="font-size: 16px; margin-bottom: 0;">Best regards,<br>Your Support Team</p>
-//         </div>
-//         <div style="background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 14px; color: #6c757d;">
-//             <p style="margin: 0 0 10px;">This is an automated message, please do not reply to this email.</p>
-//             <p style="margin: 0;">© ${new Date().getFullYear()} Your Company Name. All rights reserved.</p>
-//         </div>
-//     </div>
-// </body>
-// </html>`
-//   );
-//   return {
-//     message: "Reset password link sent via your email successfully",
-//     resetPassLink,
-//   };
-// };
 
 // verify otp
 const verifyOtp = async (otp: string) => {
@@ -553,7 +417,6 @@ const resetPassword = async (
 export const AuthServices = {
   loginUser,
   socialLogin,
-  loginWebsite,
   refreshToken,
   changePassword,
   forgotPassword,
