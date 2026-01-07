@@ -10,21 +10,18 @@ import { paginationFields } from "../../../constants/pagination";
 import { isValidObjectId } from "../../../utils/validateObjectId";
 import { IUploadedFile } from "../../../interfaces/file";
 
-// create role for supper admin
-const createRoleSupperAdmin = catchAsync(
-  async (req: Request, res: Response) => {
-    const userData = req.body;
-    const result = await UserService.createRoleSupperAdmin(userData);
+// create user
+const createUser = catchAsync(async (req: Request, res: Response) => {
+  const userData = req.body;
+  const result = await UserService.createUser(userData);
 
-    sendResponse(res, {
-      statusCode: httpStatus.CREATED,
-      success: true,
-      message: "OTP generated and sent to email successfully",
-      data: result,
-    });
-  }
-);
-
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: "OTP generated and sent to email successfully",
+    data: result,
+  });
+});
 // get all users
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   const filter = pick(req.query, filterField);
@@ -104,7 +101,7 @@ const deleteMyAccount = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const UserController = {
-  createRoleSupperAdmin,
+  createUser,
   getAllUsers,
   getUserById,
   updateUser,

@@ -12,12 +12,13 @@ import { IUploadedFile } from "../../../interfaces/file";
 import { uploadFile } from "../../../helpars/fileUploader";
 import { getDateRange } from "../../../helpars/filterByDate";
 
-// create role for supper admin
-const createRoleSupperAdmin = async (payload: any) => {
+// create user
+const createUser = async (payload: any) => {
   // check if email exists
   const existingUser = await prisma.user.findUnique({
-    where: { email: payload.email, status: UserStatus.ACTIVE },
+    where: { email: payload.email },
   });
+
   if (existingUser) {
     throw new ApiError(httpStatus.BAD_REQUEST, "User already exists");
   }
@@ -25,23 +26,11 @@ const createRoleSupperAdmin = async (payload: any) => {
   // hash password
   const hashedPassword = await bcrypt.hash(payload.password, 12);
 
+  // create user with inactive status
   const user = await prisma.user.create({
     data: {
       ...payload,
       password: hashedPassword,
-    },
-    select: {
-      id: true,
-      fullName: true,
-      email: true,
-      profileImage: true,
-      contactNumber: true,
-      address: true,
-      country: true,
-      role: true,
-      status: true,
-      createdAt: true,
-      updatedAt: true,
     },
   });
 
@@ -255,7 +244,7 @@ const deleteMyAccount = async (userId: string) => {
 };
 
 export const UserService = {
-  createRoleSupperAdmin,
+  createUser,
   getAllUsers,
   getUserById,
   updateUser,

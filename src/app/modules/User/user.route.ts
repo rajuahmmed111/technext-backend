@@ -40,17 +40,11 @@ router.get(
   UserController.getUserById
 );
 
-// create role for supper admin
+// create user
 router.post(
   "/",
-  auth(
-    UserRole.SUPER_ADMIN,
-    UserRole.ADMIN,
-    UserRole.BUSINESS_PARTNER,
-    UserRole.USER
-  ),
   validateRequest(userValidation.createUserZodSchema),
-  UserController.createRoleSupperAdmin
+  UserController.createUser
 );
 
 // single update user (info + profile image)
