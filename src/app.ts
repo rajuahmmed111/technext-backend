@@ -17,17 +17,11 @@ declare global {
 
 const app: Application = express();
 
-// AWS / Reverse Proxy setup
-app.set("trust proxy", true);
-
 export const corsOptions = {
   origin: [
     "http://localhost:5173",
     "http://localhost:3000",
-    "https://timothy-dashboard.netlify.app",
-    "https://temothy-dashboard.vercel.app",
   ],
-  // origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
@@ -45,14 +39,11 @@ app.use(
   })
 );
 
-app.use(bodyParser.json());
-
-// Middleware setup
 app.use(cors(corsOptions));
-app.use(cookieParser());
+app.options("*", cors(corsOptions)); // Handle preflight requests
 
+app.use(cookieParser());
 app.use(express.json());
-// app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
@@ -63,8 +54,8 @@ app.get("/", (req: Request, res: Response) => {
   });
 });
 
-// app.use("/uploads", express.static(path.join("/var/www/uploads")));
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads"))); // Serve static files from the "uploads" directory
+// Serve static files from the "uploads" directory
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Setup API routes
 app.use("/api/v1", router);
