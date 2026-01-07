@@ -43,7 +43,12 @@ router.get(
 // create role for supper admin
 router.post(
   "/",
-  auth(UserRole.SUPER_ADMIN),
+  auth(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.BUSINESS_PARTNER,
+    UserRole.USER
+  ),
   validateRequest(userValidation.createUserZodSchema),
   UserController.createRoleSupperAdmin
 );
