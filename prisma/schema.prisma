@@ -50,6 +50,8 @@ model User {
   otpExpiry  DateTime?
   identifier String?
 
+  shortenedUrls ShortenedUrl[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -67,4 +69,19 @@ model Admin {
   updatedAt DateTime @updatedAt
 
   @@map("admins")
+}
+
+model ShortenedUrl {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  originalUrl String
+  shortCode   String @unique
+  clicks      Int    @default(0)
+  userId      String @db.ObjectId
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("shortened_urls")
 }
