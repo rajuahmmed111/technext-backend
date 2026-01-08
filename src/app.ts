@@ -18,11 +18,11 @@ declare global {
 const app: Application = express();
 
 export const corsOptions = {
-  // origin: [
-  //   "http://localhost:5173",
-  //   "http://localhost:3000",
-  // ],
-  origin: ["*"],
+  origin: [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://technext-frontend.vercel.app",
+  ],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
@@ -41,7 +41,7 @@ app.use(
 );
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Handle preflight requests
+app.options("*", cors(corsOptions));
 
 app.use(cookieParser());
 app.use(express.json());
